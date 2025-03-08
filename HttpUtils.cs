@@ -21,8 +21,8 @@ public static class HttpUtils
     {
         var client = new HttpClient();
         using HttpResponseMessage response = client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead)
-                                                   .ConfigureAwait(false)
-                                                   .GetAwaiter().GetResult();
+            .ConfigureAwait(false)
+            .GetAwaiter().GetResult();
         try
         {
             response.EnsureSuccessStatusCode();
@@ -85,7 +85,10 @@ public static class HttpUtils
                 if (loading_screen == null) Debug.Log("Failed to find loading screen.");
             }
 
-            var msg = $"Downloading {Path.GetFileName(file_path)}: {received}/{total} bytes";
+            var msg = $"Downloading latest {Path.GetFileName(file_path)}: {received}/{total} bytes";
+            if (LocalizedTextManager.instance.language == "cz" || LocalizedTextManager.instance.language == "ch")
+                msg = $"正在下载最新 {Path.GetFileName(file_path)}: {received}/{total} B";
+
             if (loading_screen != null)
             {
                 loading_screen.loadingHelperText.text = msg;
