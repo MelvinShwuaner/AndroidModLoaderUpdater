@@ -33,6 +33,15 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Reference Include="Il2CppInterop.Runtime">
+          <HintPath>assembly-dependencies\Il2CppInterop.Runtime.dll</HintPath>
+        </Reference>
+        <Reference Include="Il2Cppmscorlib">
+          <HintPath>assembly-dependencies\Il2Cppmscorlib.dll</HintPath>
+        </Reference>
+        <Reference Include="MelonLoader">
+          <HintPath>assembly-dependencies\MelonLoader.dll</HintPath>
+        </Reference>
         <Reference Include="Newtonsoft.Json">
           <HintPath>assembly-dependencies\Newtonsoft.Json.dll</HintPath>
         </Reference>

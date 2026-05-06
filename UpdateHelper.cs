@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
+using Il2CppInterop.Runtime;
 using UnityEngine;
 
 namespace NeoModLoader.AutoUpdate;
@@ -60,7 +61,7 @@ public static class UpdateHelper
             {
                 parent = WorldBoxMod.I.transform.parent
             }
-        }.AddComponent(type);
+        }.AddComponent(Il2CppType.From(type));
         ModLoader.modsLoaded.Add("NeoModLoader");
         Debug.Log("[NeoModLoader] Was added manually");
     }

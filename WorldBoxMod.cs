@@ -2,12 +2,24 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using Il2CppInterop.Runtime.Injection;
+using MelonLoader;
+using MelonLoader.Utils;
 using UnityEngine;
 
 namespace NeoModLoader.AutoUpdate;
 
+[MelonLoader.RegisterTypeInIl2Cpp]
 public class WorldBoxMod : MonoBehaviour
 {
+    public WorldBoxMod(IntPtr ptr) : base(ptr)
+    {
+    }
+
+    public WorldBoxMod() : base(ClassInjector.DerivedConstructorPointer<WorldBoxMod>())
+    {
+        ClassInjector.DerivedConstructorBody(this);
+    }
     public static WorldBoxMod I              { get; private set; }
     public static Version     CurrentVersion { get; private set; }
 
@@ -15,8 +27,8 @@ public class WorldBoxMod : MonoBehaviour
     {
         I = this;
         Debug.Log($"Begin to check update for NML. Current version: {CurrentVersion}");
-        var path1 = Path.Combine(Application.streamingAssetsPath, "Mods", "NeoModLoader.dll");
-        var path2 = Path.Combine(Application.streamingAssetsPath, "Mods", "NeoModLoader_memload.dll");
+        var path1 = Path.Combine(MelonEnvironment.GameRootDirectory, "Mods", "NeoModLoader_mobile.dll");
+        var path2 = Path.Combine(MelonEnvironment.GameRootDirectory, "Mods", "NeoModLoader_memload.dll");
         var both_existed = File.Exists(path1) && File.Exists(path2);
         var any_existed = File.Exists(path1) || File.Exists(path2);
         if (both_existed)
@@ -40,9 +52,8 @@ public class WorldBoxMod : MonoBehaviour
 
         var updaters = new List<AUpdater>
         {
-            new WorkshopUpdater(),
             new GithubUpdater(),
-            new GiteeUpdater()
+           // new GiteeUpdater() //what the fuck is gitee
         };
         var async = false;
         foreach (AUpdater updater in updaters)
@@ -61,16 +72,29 @@ public class WorldBoxMod : MonoBehaviour
             {
                 UpdateVersion();
                 Debug.Log($"Updated to latest version: {CurrentVersion} from {updater.GetType().Name}");
-                if ((!no_async && !ModLoader.getModsLoaded().Contains("NeoModLoader")) || !any_existed)
+                if ((!no_async && !IsNeoModLoaderLoaded()) || !any_existed)
                     UpdateHelper.LoadNMLManually();
 
                 return;
             }
         }
 
-        if (async && !ModLoader.getModsLoaded().Contains("NeoModLoader")) UpdateHelper.LoadNMLManually();
+        if (async && !IsNeoModLoaderLoaded()) UpdateHelper.LoadNMLManually();
 
         Debug.Log($"No update available. Current version: {CurrentVersion}");
+    }
+
+    static bool IsNeoModLoaderLoaded()
+    {
+        foreach (var mod in MelonMod.RegisteredMelons)
+        {
+            if (Path.GetFileName(mod.MelonAssembly.Location) == "NeoModLoader_mobile.dll")
+            {
+                return true;
+            }   
+        }
+
+        return false;
     }
 
     internal void UpdateVersion()

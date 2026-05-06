@@ -10,7 +10,7 @@ namespace NeoModLoader.AutoUpdate;
 
 public class GithubUpdater : AUpdater
 {
-    private const string release_url = "https://api.github.com/repos/WorldBoxOpenMods/ModLoader/releases/tags/latest";
+    private const string release_url = "https://api.github.com/repos/MelvinShwuaner/AndroidModLoader/releases/tags/latest";
     private       Version online_version;
     private       ReleaseInfo release_info;
 
@@ -40,7 +40,7 @@ public class GithubUpdater : AUpdater
         if (!string.IsNullOrEmpty(pdb_asset?.browser_download_url))
         {
             var downloaded =
-                await UpdateHelper.DownloadFile(pdb_asset.browser_download_url, download_postfix, "NeoModLoader.pdb");
+                await UpdateHelper.DownloadFile(pdb_asset.browser_download_url, download_postfix, "NeoModLoader_mobile.pdb");
             if (!string.IsNullOrEmpty(downloaded)) UpdateHelper.TryReplaceFile(Paths.NMLPdbPath, downloaded);
         }
 
@@ -49,7 +49,7 @@ public class GithubUpdater : AUpdater
         {
             var NML_taken = !UpdateHelper.BackupFile(Paths.NMLPath);
             var downloaded =
-                await UpdateHelper.DownloadFile(dll_asset.browser_download_url, download_postfix, "NeoModLoader.dll");
+                await UpdateHelper.DownloadFile(dll_asset.browser_download_url, download_postfix, "NeoModLoader_mobile.dll");
             if (NML_taken) return UpdateResult.IsTaken;
             if (!string.IsNullOrEmpty(downloaded))
             {
