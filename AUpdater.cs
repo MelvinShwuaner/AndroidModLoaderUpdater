@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace NeoModLoader.AutoUpdate;
-
+using static UpdateHelper;
 public abstract class AUpdater
 {
     /// <summary>
@@ -21,7 +21,7 @@ public abstract class AUpdater
     {
         if (!IsAvailable())
         {
-            Debug.Log($"{GetType().Name} is not available");
+            LogMsg($"{GetType().Name} is not available");
             return false;
         }
 
@@ -31,9 +31,9 @@ public abstract class AUpdater
         }
         catch (Exception e)
         {
-            Debug.Log($"{GetType().Name} failed to check update. The reason is below:");
-            Debug.Log($"{e.Message}");
-            Debug.Log(e.StackTrace);
+            LogMsg($"{GetType().Name} failed to check update. The reason is below:");
+            LogMsg($"{e.Message}");
+            LogMsg(e.StackTrace);
             return false;
         }
 
@@ -54,9 +54,9 @@ public abstract class AUpdater
         }
         catch (Exception e)
         {
-            Debug.Log($"{GetType().Name} failed to download and replace. The reason is below:");
-            Debug.Log($"{e.Message}");
-            Debug.Log(e.StackTrace);
+            LogMsg($"{GetType().Name} failed to download and replace. The reason is below:");
+            LogMsg($"{e.Message}");
+            LogMsg(e.StackTrace);
         }
 
         return false;

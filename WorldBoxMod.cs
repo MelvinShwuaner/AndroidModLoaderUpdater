@@ -6,9 +6,8 @@ using Il2CppInterop.Runtime.Injection;
 using MelonLoader;
 using MelonLoader.Utils;
 using UnityEngine;
-
 namespace NeoModLoader.AutoUpdate;
-
+using static UpdateHelper;
 [MelonLoader.RegisterTypeInIl2Cpp]
 public class WorldBoxMod : MonoBehaviour
 {
@@ -22,11 +21,9 @@ public class WorldBoxMod : MonoBehaviour
     }
     public static WorldBoxMod I              { get; private set; }
     public static Version     CurrentVersion { get; private set; }
-
-    public async void Awake()
+    public void Awake()
     {
         I = this;
-        Debug.Log($"Begin to check update for NML. Current version: {CurrentVersion}");
         var path1 = Path.Combine(MelonEnvironment.GameRootDirectory, "Mods", "NeoModLoader_mobile.dll");
         var path2 = Path.Combine(MelonEnvironment.GameRootDirectory, "Mods", "NeoModLoader_memload.dll");
         var both_existed = File.Exists(path1) && File.Exists(path2);
@@ -49,7 +46,7 @@ public class WorldBoxMod : MonoBehaviour
             Paths.NMLPath = path1;
 
         UpdateVersion();
-
+        LogMsg($"Begin to check update for NML. Current version: {CurrentVersion}");
         var updaters = new List<AUpdater>
         {
             new GithubUpdater(),
@@ -68,10 +65,10 @@ public class WorldBoxMod : MonoBehaviour
              * 4. Mod loaded: AutoUpdate->NeoModLoader, download file: old file is deleted, start downloading new file, replace failed and restore old file(async). NML is not existed so that it should be loaded manually.
              * 5. Mod loaded: AutoUpdate->NeoModLoader, NML is not existed so that it should be loaded manually.
              */
-            if (await awaiter_res)
+            if (awaiter_res.GetAwaiter().GetResult())
             {
                 UpdateVersion();
-                Debug.Log($"Updated to latest version: {CurrentVersion} from {updater.GetType().Name}");
+                LogMsg($"Updated to latest version: {CurrentVersion} from {updater.GetType().Name}");
                 if ((!no_async && !IsNeoModLoaderLoaded()) || !any_existed)
                     UpdateHelper.LoadNMLManually();
 
@@ -81,11 +78,15 @@ public class WorldBoxMod : MonoBehaviour
 
         if (async && !IsNeoModLoaderLoaded()) UpdateHelper.LoadNMLManually();
 
-        Debug.Log($"No update available. Current version: {CurrentVersion}");
+        LogMsg($"No update available. Current version: {CurrentVersion}");
     }
 
     static bool IsNeoModLoaderLoaded()
     {
+        if (ModLoader.modsLoaded.Contains("NeoModLoader"))
+        {
+            return true;
+        }
         foreach (var mod in MelonMod.RegisteredMelons)
         {
             if (Path.GetFileName(mod.MelonAssembly.Location) == "NeoModLoader_mobile.dll")

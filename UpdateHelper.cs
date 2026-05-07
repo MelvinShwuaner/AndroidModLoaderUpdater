@@ -5,6 +5,7 @@ using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
 using Il2CppInterop.Runtime;
+using MelonLoader;
 using UnityEngine;
 
 namespace NeoModLoader.AutoUpdate;
@@ -19,6 +20,11 @@ public enum UpdateResult
 
 public static class UpdateHelper
 {
+    public static void LogMsg(string msg)
+    {
+        MelonLogger.Msg(msg);
+        Debug.Log(msg);
+    }
     private static readonly Dictionary<string, byte[]> file_bak = new();
 
     public static bool BackupFile(string file_path)
@@ -53,7 +59,7 @@ public static class UpdateHelper
             assembly = Assembly.Load(nml_bytes, File.ReadAllBytes(Paths.NMLPdbPath));
         else
             assembly = Assembly.Load(nml_bytes);
-
+        RegisterTypeInIl2Cpp.RegisterAssembly(assembly);
         Type type = assembly.GetType("NeoModLoader.WorldBoxMod");
         new GameObject("NeoModLoader")
         {
@@ -63,7 +69,7 @@ public static class UpdateHelper
             }
         }.AddComponent(Il2CppType.From(type));
         ModLoader.modsLoaded.Add("NeoModLoader");
-        Debug.Log("[NeoModLoader] Was added manually");
+        LogMsg("[NeoModLoader] Was added manually");
     }
 
     public static UpdateResult TryReplaceFile(string pOldFile, string pNewFile)
@@ -117,13 +123,13 @@ public static class UpdateHelper
             Path.Combine(Path.GetTempPath(), $"{components[0]}_{postfix}_completed.{components[1]}");
         if (!File.Exists(download_complete_path))
         {
-            using var client = new WebClient();
             try
             {
                 await HttpUtils.DownloadFile(download_url, download_path);
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                LogMsg(e.ToString());
                 return "";
             }
 

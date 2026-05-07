@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 using UnityEngine;
 
 namespace NeoModLoader.AutoUpdate;
-
+using static UpdateHelper;
 public class GiteeUpdater : AUpdater
 {
     private const string      release_url = "https://gitee.com/api/v5/repos/inmny/nmlmirror/releases/tags/latest";
@@ -20,7 +20,7 @@ public class GiteeUpdater : AUpdater
         var left_idx = release_info.name.IndexOf('(');
         var right_idx = release_info.name.IndexOf(')');
         online_version = new Version(release_info.name.Substring(left_idx + 1, right_idx - left_idx - 1));
-        Debug.Log($"Gitee latest version: {online_version}");
+        LogMsg($"Gitee latest version: {online_version}");
         return online_version <= WorldBoxMod.CurrentVersion;
     }
 
